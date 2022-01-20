@@ -22,20 +22,20 @@ def newsfeed(request):
     ctx ={'posts': posts, 'form':form}
     return render(request, 'twitter/newsfeed.html', ctx)
 
+from .models import Profile
 
 def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
+	if request.method == 'POST':
+		form = UserRegisterForm(request.POST)
+		if form.is_valid():
+			user = form.save()
+			Profile.objects.create(user = user) # crea el perfil 		
+			return redirect('home')
+	else:
+		form = UserRegisterForm()
 
-    else:
-        form = UserRegisterForm()
-    ctx = {
-        'form': form
-    }
-    return render(request, 'twitter/register.html', ctx)
+	context = {'form' : form}
+	return render(request, 'twitter/register.html', context)
 
 def delPost(request, pk):
     postTarget = Post.objects.get(id=pk)
@@ -88,10 +88,10 @@ def follow(request, username):                      # parametro para obtener el 
 
 from .models import Relationship
 
-def unfollow(request, username):                      # parametro para obtener el usuario que estamos visitando
-	current_user = request.user                     # nuestro perfil de usuario
-	to_user = User.objects.get(username=username)   # obtenemos el usuario que visitamos
-	to_user_id = to_user                            # le saca la id al usuario que visitamos
-	rel = Relationship(from_user=current_user, to_user=to_user_id) # se crea una instancia del modelo relacional
-	rel.delete()                                      # guarda el model
+def unfollow(request, username):
+	current_user = request.user
+	to_user = User.objects.get(username=username)
+	to_user_id = to_user.id
+	rel = Relationship.objects.get(from_user=current_user.id, to_user=to_user_id)
+	rel.delete()
 	return redirect('home')
