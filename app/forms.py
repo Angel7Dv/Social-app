@@ -23,23 +23,16 @@ class PostForm(forms.ModelForm):
 		model = Post
 		fields = ['content']
 
-# class PostForm(forms.ModelForm):
-# 	content = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control w-100',
-# 								'id':'contentsBox', 'rows':'3',
-# 								'placeholder':'¿Qué está pasando?'}))
 
-# 	class Meta:
-# 		model = Post
-# 		fields = ['content']
 
-# class UserUpdateForm(forms.ModelForm):
-# 	class Meta:
-# 		model = User
-# 		fields = ['first_name', 'username']
+class UserUpdateForm(forms.ModelForm):
+	class Meta:
+		model = User
+		fields = ['first_name', 'username']
 
-# class ProfileUpdateForm(forms.ModelForm):
-# 	class Meta:
-# 		model = Profile
-# 		fields = ['image', 'bio']
+class ProfileUpdateForm(forms.ModelForm):
+	class Meta:
+		model = Profile
+		fields = ['image', 'bio']
 
 

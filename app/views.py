@@ -39,8 +39,8 @@ def register(request):
 
 def delPost(request, pk):
     postTarget = Post.objects.get(id=pk)
-    postTarget.delete()
-
+    if request.user == postTarget.user:
+        postTarget.delete()
     return redirect('home')
 
 from django.contrib.auth.models import User
@@ -52,4 +52,46 @@ def profile(request, username):
     ctx = { 'user':user, 'posts':posts}
     return render(request, 'twitter/profile.html', ctx)
 
-    
+
+
+from .forms import UserUpdateForm, ProfileUpdateForm
+
+def editar(request):
+	if request.method == 'POST':
+		u_form = UserUpdateForm(request.POST, instance=request.user)
+		p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+
+		if u_form.is_valid() and p_form.is_valid():
+			u_form.save()
+			p_form.save()
+			return redirect('home')
+	else:
+		u_form = UserUpdateForm(instance=request.user)
+		p_form = ProfileUpdateForm()
+
+	context = {'u_form' : u_form, 'p_form' : p_form}
+	return render(request, 'twitter/editar.html', context)
+
+# Seguir usuario
+
+from .models import Relationship
+
+def follow(request, username):                      # parametro para obtener el usuario que estamos visitando
+	current_user = request.user                     # nuestro perfil de usuario
+	to_user = User.objects.get(username=username)   # obtenemos el usuario que visitamos
+	to_user_id = to_user                            # le saca la id al usuario que visitamos
+	rel = Relationship(from_user=current_user, to_user=to_user_id) # se crea una instancia del modelo relacional
+	rel.save()                                      # guarda el model
+	return redirect('home')
+
+# dejar de seguirusuario
+
+from .models import Relationship
+
+def unfollow(request, username):                      # parametro para obtener el usuario que estamos visitando
+	current_user = request.user                     # nuestro perfil de usuario
+	to_user = User.objects.get(username=username)   # obtenemos el usuario que visitamos
+	to_user_id = to_user                            # le saca la id al usuario que visitamos
+	rel = Relationship(from_user=current_user, to_user=to_user_id) # se crea una instancia del modelo relacional
+	rel.delete()                                      # guarda el model
+	return redirect('home')

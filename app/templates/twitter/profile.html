@@ -16,15 +16,33 @@
 
                     <p class="card-text">Tony</p>
                     <h6 class="card-title font-weight-bold">
-                        100 Followers
-                        100 Following
+                        {{ user.profile.followers.count }} Followers
+                        {{ user.profile.following.count }} Following
                     </h6>
+
+                      {% if request.user.is_authenticated %} 
+                      <!-- Si el usuario esta autentificado -->
+                            {% if user.username != request.user.username %}
+                            <!-- si el perfil es diferente al usuario -->
+                                {% if user not in request.user.profile.following %}
+                                <!-- si el perfil no se encuentra en las relaciones -->
+
+                                <a href="{% url 'follow' user %}" class="btn  text-white rounded-pill">Seguir</a>
+                                {% else %}
+
+                                <!-- si el perfil se encuentra en las relaciones -->
+                                <a href="{% url 'unfollow' user %}" class="btn  text-white rounded-pill">Dejar de seguir</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
                 </div>
 
             </div>
+            {% if user == request.user %}
             <a href="#" id="addATweetLeft" type="button"
                 style="border-radius: 30px; font-size: 1.1rem; font-weight:bold;"
                 class="btn btn-lg btn-block mt-4 text-white ">Editar mi perfil</a>
+            {% endif %}
         </div>
     </div>
     <!-- End Barra Izquierda -->
@@ -40,9 +58,9 @@
             <!-- FOR LOOP HERE -->
             <div class="tweet-wrap" style="border-radius:20px">
                 <div class="tweet-header">
-                    <img src="../../static/img/tony.jpg" alt="" class="avator">
+                    <img src="{{ i.user.profile.image.url }}" alt="" class="avator">
                     <div class="tweet-header-info">
-                        {{ i.user.firs_name }} <span>@{{ i.user }}</span><span>3 hours
+                        {{ i.user.first_name }} <span>@{{ i.user }}</span><span>3 hours
                         </span>
                         <p>test</p>
                     </div>

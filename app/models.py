@@ -24,6 +24,17 @@ class Profile(models.Model):
     # campos foraneos
     # user.posts
 
+	def following(self):
+		user_ids = Relationship.objects.filter(from_user=self.user)\
+									.values_list('to_user_id', flat=True)
+		return User.objects.filter(id__in=user_ids)
+
+	def followers(self):
+		user_ids = Relationship.objects.filter(to_user=self.user)\
+									.values_list('from_user_id', flat=True)
+		return User.objects.filter(id__in=user_ids)
+
+
 class Post(models.Model):
 	timestamp = models.DateTimeField(default=timezone.now)
 	content = models.TextField()
@@ -34,3 +45,12 @@ class Post(models.Model):
 
 	def __str__(self):
 		return self.content
+
+
+class Relationship(models.Model):
+	# Deberia ser oneToMany por que se puede seguir todas las veces que se quiera
+	from_user = models.ForeignKey(User, related_name='relationships', on_delete=models.CASCADE) 
+	to_user = models.ForeignKey(User, related_name='related_to', on_delete=models.CASCADE)
+
+	def __str__(self):
+		return f'{self.from_user} to {self.to_user}'
